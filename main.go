@@ -2,9 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"log"
 	"net/http"
 	"time"
+	_ "github.com/gin-gonic/gin"
 )
 
 const (
@@ -29,22 +33,80 @@ type Bulletin struct {
 var db *sql.DB
 
 func getBulletins() ([]Bulletin, error) {
+	const query = `SELECT author, content, created_at FROM bulletins ORDER BY created_at DESC LIMIT 100`
+	//good practice to prepare
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]Bulletin, 0)
+
+	for rows.Next() {
+		var author string
+		var content string
+		var createdAt time.Time
+		err = rows.Scan(&author, &content, &createdAt)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, Bulletin{author, content, createdAt})
+	}
+
 	return nil, nil
 }
 
 func addBulletin(bulletin Bulletin) error {
-	return nil
+	const query = `INSERT INTO bulletins(author, content, created_at) VALUES ($1, $2, $3)`
+	_, err := db.Exec(query, bulletin.Author, bulletin.Content, bulletin.CreatedAt)
+	return err
 }
 
 func main() {
 	var err error
 
 	var r = gin.Default()
+	//get bulletins from board
 	r.GET("/board", func(context *gin.Context) {
 		results, err := getBulletins()
 		if err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
 			return
 		}
+
+		context.JSON(http.StatusOK, results)
 	})
+
+	r.POST("/board", func(context *gin.Context) {
+		var b Bulletin
+
+		if context.Bind(&b) == nil {
+			b.CreatedAt = time.Now()
+			if err := addBulletin(b); err != nil {
+				context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
+				return
+			}
+
+			context.JSON(http.StatusOK, gin.H{"status": "ok"})
+		}
+	})
+
+	dbInfo := fmt.Sprint("host=&s user=&s password=&s dbname=&s sslmode=disabled", DbHost, DbUser, DbPassword, DbName)
+	db, err = sql.Open("postgres", dbInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	_, err = db.Query(Migration)
+	if err != nil {
+		log.Println("Failed to run migrations ", err.Error())
+		return
+	}
+
+	log.Println("running...")
+	if err := r.Run(":8080"); err != nil {
+		panic(err)
+	}
 }
