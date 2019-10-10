@@ -23,18 +23,16 @@ created_at timestamp with time zone DEFAULT current_timestamp)`
 )
 
 type Bulletin struct {
-	Author    string    `json:"author" binding: "required"`
-	Content   string    `json:"content" binding: "required"`
-	CreatedAt time.Time `json:"created_at""`
+	Author    string    `json:"author" binding:"required"`
+	Content   string    `json:"content" binding:"required"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 var db *sql.DB
 
-
-func getBulletins() ([]Bulletin, error) {
-	const query = `SELECT author, content, created_at FROM bulletins ORDER BY created_at DESC LIMIT 100`
-	//good practice to prepare
-	rows, err := db.Query(query)
+func GetBulletins() ([]Bulletin, error) {
+	const q = `SELECT author, content, created_at FROM bulletins ORDER BY created_at DESC LIMIT 100`
+	rows, err := db.Query(q)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +53,9 @@ func getBulletins() ([]Bulletin, error) {
 	return results, nil
 }
 
-func addBulletin(bulletin Bulletin) error {
-	const query = `INSERT INTO bulletins(author, content, created_at) VALUES ($1, $2, $3)`
-	_, err := db.Exec(query, bulletin.Author, bulletin.Content, bulletin.CreatedAt)
+func AddBulletin(bulletin Bulletin) error {
+	const q = `INSERT INTO bulletins(author, content, created_at) VALUES ($1, $2, $3)`
+	_, err := db.Exec(q, bulletin.Author, bulletin.Content, bulletin.CreatedAt)
 	return err
 }
 
@@ -66,7 +64,7 @@ func main() {
 	r := gin.Default()
 	//get bulletins from board
 	r.GET("/board", func(context *gin.Context) {
-		results, err := getBulletins()
+		results, err := GetBulletins()
 		if err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
 			return
@@ -80,7 +78,7 @@ func main() {
 
 		if context.Bind(&b) == nil {
 			b.CreatedAt = time.Now()
-			if err := addBulletin(b); err != nil {
+			if err := AddBulletin(b); err != nil {
 				context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
 				return
 			}
@@ -88,13 +86,17 @@ func main() {
 			context.JSON(http.StatusOK, gin.H{"status": "ok"})
 		}
 		context.JSON(http.StatusUnprocessableEntity, gin.H{"status": "invalid body"})
+		return
 	})
 
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", DbHost, DbUser, DbPassword, DbName)
 	db, err = sql.Open("postgres", dbInfo)
 	if err != nil {
 		panic(err)
+		log.Println("Failed to connect to db")
 	}
+
+	defer db.Close()
 
 	_, err = db.Query(Migration)
 	if err != nil {
@@ -106,6 +108,4 @@ func main() {
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
-
-	defer db.Close()
 }
