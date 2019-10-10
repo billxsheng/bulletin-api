@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.service.type: LoadBalancer
+    kompose.version: 1.18.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: billboardapi
+  name: billboardapi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.service.type: LoadBalancer
+        kompose.version: 1.18.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: billboardapi
+    spec:
+      containers:
+      - env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: billxsheng/billboardapi:v1
+        name: billboardapi
+        ports:
+        - containerPort: 8080
+        resources: {}
+        volumeMounts:
+        - mountPath: /go/src/billboardAPI
+          name: billboardapi-claim0
+      hostname: billboardapi
+      restartPolicy: Always
+      volumes:
+      - name: billboardapi-claim0
+        persistentVolumeClaim:
+          claimName: billboardapi-claim0
+status: {}
