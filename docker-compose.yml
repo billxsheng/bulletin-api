@@ -9,8 +9,8 @@ services:
     environment:
       GET_HOST_FROM: dns
       POSTGRES_DB: dev
-      POSTGRES_USER: postgres_dev
-      POSTGRES_PASWORD: password1
+      POSTGRES_USER: postgres-dev
+      POSTGRES_PASWORD: mysecretpassword
     ports:
       - 5432:5432
     networks:

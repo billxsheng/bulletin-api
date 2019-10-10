@@ -8,29 +8,28 @@ import (
 	"log"
 	"net/http"
 	"time"
-	_ "github.com/gin-gonic/gin"
 )
 
 const (
-	DbHost = "db"
-	DbUser = "postgres-dev"
-	DbPassword = "password1"
-	DbName = "dev"
-	Migration = `CREATE TABLE IF NOT EXISTS bulletin (
-		id serial PRIMARY KEY,
-		author text NOT NULL,
-		content text NOT NULL,
-		created_at timestamp with time zone DEFAULT current_timestamp
-	)`
+	DbHost     = "db"
+	DbUser     = "postgres-dev"
+	DbPassword = "mysecretpassword"
+	DbName     = "dev"
+	Migration  = `CREATE TABLE IF NOT EXISTS bulletins (
+id serial PRIMARY KEY,
+author text NOT NULL,
+content text NOT NULL,
+created_at timestamp with time zone DEFAULT current_timestamp)`
 )
 
 type Bulletin struct {
-	Author string `json:"author" binding: "required"`
-	Content string `json:content binding: "required"`
-	CreatedAt time.Time `json:created_at"`
+	Author    string    `json:"author" binding: "required"`
+	Content   string    `json:"content" binding: "required"`
+	CreatedAt time.Time `json:"created_at""`
 }
 
 var db *sql.DB
+
 
 func getBulletins() ([]Bulletin, error) {
 	const query = `SELECT author, content, created_at FROM bulletins ORDER BY created_at DESC LIMIT 100`
@@ -53,7 +52,7 @@ func getBulletins() ([]Bulletin, error) {
 		results = append(results, Bulletin{author, content, createdAt})
 	}
 
-	return nil, nil
+	return results, nil
 }
 
 func addBulletin(bulletin Bulletin) error {
@@ -64,8 +63,7 @@ func addBulletin(bulletin Bulletin) error {
 
 func main() {
 	var err error
-
-	var r = gin.Default()
+	r := gin.Default()
 	//get bulletins from board
 	r.GET("/board", func(context *gin.Context) {
 		results, err := getBulletins()
@@ -89,19 +87,18 @@ func main() {
 
 			context.JSON(http.StatusOK, gin.H{"status": "ok"})
 		}
+		context.JSON(http.StatusUnprocessableEntity, gin.H{"status": "invalid body"})
 	})
 
-	dbInfo := fmt.Sprint("host=&s user=&s password=&s dbname=&s sslmode=disabled", DbHost, DbUser, DbPassword, DbName)
+	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", DbHost, DbUser, DbPassword, DbName)
 	db, err = sql.Open("postgres", dbInfo)
 	if err != nil {
 		panic(err)
 	}
 
-	defer db.Close()
-
 	_, err = db.Query(Migration)
 	if err != nil {
-		log.Println("Failed to run migrations ", err.Error())
+		log.Println("Failed to run migrations", err.Error())
 		return
 	}
 
@@ -109,4 +106,6 @@ func main() {
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
+
+	defer db.Close()
 }

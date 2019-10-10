@@ -8,7 +8,7 @@ COPY . /go/src/bulletinAPI
 
 RUN go install bulletinAPI
 
-CMD /go/bin//bulletinAPI
+CMD /go/bin/bulletinAPI
 
 EXPOSE 8080
 
