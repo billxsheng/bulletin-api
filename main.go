@@ -10,16 +10,25 @@ import (
 	"time"
 )
 
-const (
-	DbHost     = "db"
-	DbUser     = "postgres-dev"
-	DbPassword = "mysecretpassword"
-	DbName     = "dev"
-	Migration  = `CREATE TABLE IF NOT EXISTS billboards (
+/*
+Defining Constants
+*/
+const DBHOST = "db"
+const DBUSER = "postgres-dev"
+const DBPASSWORD = "mysecretpassword"
+const DBNAME = "dev"
+const DB_MIGRATION = `CREATE TABLE IF NOT EXISTS billboards (
 id serial PRIMARY KEY,
 author text NOT NULL,
 content text NOT NULL,
 created_at timestamp with time zone DEFAULT current_timestamp)`
+
+const (
+	DbHost     = DBHOST
+	DbUser     = DBUSER
+	DbPassword = DBPASSWORD
+	DbName     = DBNAME
+	Migration  = DB_MIGRATION
 )
 
 type Board struct {
