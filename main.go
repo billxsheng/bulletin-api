@@ -1,5 +1,10 @@
 package main
 
+/*
+* returns value of the variable
+& returns memory address of variable
+*/
+
 import (
 	"database/sql"
 	"fmt"
@@ -23,6 +28,9 @@ author text NOT NULL,
 content text NOT NULL,
 created_at timestamp with time zone DEFAULT current_timestamp)`
 
+/*
+DB Definitions
+*/
 const (
 	DbHost     = DBHOST
 	DbUser     = DBUSER
@@ -31,12 +39,19 @@ const (
 	Migration  = DB_MIGRATION
 )
 
+/*
+Billboard object
+Added tags to customize JSON key names and include model binding (binds request body to type)
+*/
 type Board struct {
 	Author    string    `json:"author" binding:"required"`
 	Content   string    `json:"content" binding:"required"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
+/*
+Global DB Connection
+*/
 var db *sql.DB
 
 func GetBoards() ([]Board, error) {
