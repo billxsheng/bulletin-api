@@ -93,8 +93,14 @@ func GetBoards() ([]Board, error) {
 	return results, nil
 }
 
+/*
+	AddBoard function where a Board instance is passed in and saved to db, error may be returned
+*/
 func AddBoard(billboard Board) error {
 	const q = `INSERT INTO billboards(author, content, created_at) VALUES ($1, $2, $3)`
+	/*
+		db.Exec() executes a query without returning any rows
+	*/
 	_, err := db.Exec(q, billboard.Author, billboard.Content, billboard.CreatedAt)
 	return err
 }
