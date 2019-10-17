@@ -167,13 +167,19 @@ func main() {
 	*/
 	defer db.Close()
 
+	/*
+		creating table in database
+	*/
 	_, err = db.Query(Migration)
 	if err != nil {
 		log.Println("Failed to run migrations", err.Error())
 		return
 	}
 
-	log.Println("running...")
+	/*
+		Running router on port 8080
+	*/
+	log.Println("Go Billboard is currently running.")
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
