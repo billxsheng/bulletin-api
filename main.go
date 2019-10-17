@@ -147,13 +147,24 @@ func main() {
 		return
 	})
 
+	/*
+		Binding database information to string
+	*/
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", DbHost, DbUser, DbPassword, DbName)
+
+	/*
+		Opens a connection to the database
+	*/
 	db, err = sql.Open("postgres", dbInfo)
 	if err != nil {
 		panic(err)
 		log.Println("Failed to connect to db")
 	}
 
+	/*
+		defer called when surrounding function returns
+		closing database so that closes gracefully and connection cannot be reused later
+	*/
 	defer db.Close()
 
 	_, err = db.Query(Migration)
