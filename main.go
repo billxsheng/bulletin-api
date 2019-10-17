@@ -99,7 +99,7 @@ func GetBoards() ([]Board, error) {
 func AddBoard(billboard Board) error {
 	const q = `INSERT INTO billboards(author, content, created_at) VALUES ($1, $2, $3)`
 	/*
-		db.Exec() executes a query without returning any rows
+		db.Exec() executes query without returning any rows
 	*/
 	_, err := db.Exec(q, billboard.Author, billboard.Content, billboard.CreatedAt)
 	return err
@@ -107,8 +107,14 @@ func AddBoard(billboard Board) error {
 
 func main() {
 	var err error
+	/*
+		Creates a new router with default settings
+	*/
 	r := gin.Default()
-	//get billboards
+
+	/*
+		Initializes route /board
+	*/
 	r.GET("/board", func(context *gin.Context) {
 		results, err := GetBoards()
 		if err != nil {
@@ -119,9 +125,15 @@ func main() {
 		context.JSON(http.StatusOK, results)
 	})
 
+	/*
+		Initializes route to post a new board
+	*/
 	r.POST("/board", func(context *gin.Context) {
 		var b Board
 
+		/*
+			Binds context with Board struct
+		*/
 		if context.Bind(&b) == nil {
 			b.CreatedAt = time.Now()
 			if err := AddBoard(b); err != nil {
