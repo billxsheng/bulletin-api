@@ -29,7 +29,7 @@ content text NOT NULL,
 created_at timestamp with time zone DEFAULT current_timestamp)`
 
 /*
-DB Definitions
+	DB Definitions
 */
 const (
 	DbHost     = DBHOST
@@ -40,8 +40,8 @@ const (
 )
 
 /*
-Billboard object
-Added tags to customize JSON key names and include model binding (binds request body to type)
+	Billboard object
+	Added tags to customize JSON key names and include model binding (binds request body to type)
 */
 type Board struct {
 	Author    string    `json:"author" binding:"required"`
@@ -50,27 +50,43 @@ type Board struct {
 }
 
 /*
-Global DB Connection
+	Global DB Connection
 */
 var db *sql.DB
 
+/*
+	GetBoards function which returns either a Board array or an error.
+*/
 func GetBoards() ([]Board, error) {
 	const q = `SELECT author, content, created_at FROM billboards ORDER BY created_at DESC LIMIT 100`
+	/*
+		Query from above returns either a "rows" or an error
+	*/
 	rows, err := db.Query(q)
 	if err != nil {
 		return nil, err
 	}
 
+	/*
+		make() method creates slices, maps, and channels of the type of the first argument; dynamically sized arrays (slice returns selected elements of an array as a new array object)
+		in this case, the second argument (0) specifies that length is 0
+	*/
 	results := make([]Board, 0)
 
 	for rows.Next() {
 		var author string
 		var content string
 		var createdAt time.Time
+		/*
+			Scanning data from the returned rows
+		*/
 		err = rows.Scan(&author, &content, &createdAt)
 		if err != nil {
 			return nil, err
 		}
+		/*
+			Appending new result
+		*/
 		results = append(results, Board{author, content, createdAt})
 	}
 
