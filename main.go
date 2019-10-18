@@ -105,6 +105,16 @@ func AddBoard(billboard Board) error {
 	return err
 }
 
+/*
+	UpdateBoard function where a board is updated
+*/
+func UpdateBoard(id int, newContent string) error {
+	const q = `UPDATE billboards SET content = $1 WHERE id = $2`
+
+	_, err := db.Exec(q, newContent, id)
+	return err
+}
+
 func main() {
 	var err error
 	/*
