@@ -1,0 +1,13 @@
+Concurrency & Parallelism
+
+- Concurrency is about dealing with lots of things at once. Parallelism is about doing lots of things at once.
+- Concurrency is a property of a program where two or more tasks can be in progress simultaneously. Parallelism is a run-time property where two or more tasks are being executed simultaneously. Concurrency can use parallelism.
+- You stop to tie your shoe lace when jogging (Concurrency)
+- You are jogging and listening to music (Parallelism)
+
+Goroutines
+- methods or functions which can run concurrently with other methods and functions
+- similar to threads in Java but light weight, fast and low-cost
+
+Channels
+- a way for Goroutines to communicate with one another and synchronize their execution
