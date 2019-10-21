@@ -6,8 +6,18 @@ Concurrency & Parallelism
 - You are jogging and listening to music (Parallelism)
 
 Goroutines
-- methods or functions which can run concurrently with other methods and functions
-- similar to threads in Java but light weight, fast and low-cost
+- Methods or functions which can run concurrently with other methods and functions
+- Similar to threads in Java but light weight, fast and low-cost
+
+Mutexes
+- Aka mutual exclusion is a mechanism that allows us to prevent concurrent processes from entering a critical section of data while it's already being executed by a given process
+- Bank deposit/withdraw, concurrent requests overwriting each other
+- Like a lock in Java
 
 Channels
-- a way for Goroutines to communicate with one another and synchronize their execution
+- A way for Goroutines to communicate with one another and synchronize their execution
+- Pipes that link between goroutines that allow communication and subsequently the passing of values to/from variables
+
+WaitGroups
+- Addresses the issue of functions terminating before goroutines can execute
+- Allow us to tackle this problem by blocking until any goroutines within that WaitGroup have executed successfully

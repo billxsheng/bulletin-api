@@ -158,6 +158,21 @@ func main() {
 	})
 
 	/*
+		Initializes route to update an existing board
+	*/
+	r.Post("/board/:id", func(context *gin.Context) {
+		var id = 1
+		var newContent = "new content"
+
+		if err := UpdateBoard(id, newContent); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	/*
 		Binding database information to string
 	*/
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", DbHost, DbUser, DbPassword, DbName)
