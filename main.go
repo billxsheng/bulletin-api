@@ -115,6 +115,17 @@ func UpdateBoard(id int, newContent string) error {
 	return err
 }
 
+/*
+	DeleteBoard function where a board is deleted
+*/
+func DeleteBoard(id int) error {
+	const q = `DELETE billboards WHERE id = $1`
+
+	_, err := db.Exec(q, id)
+	return err
+}
+
+
 func main() {
 	var err error
 	/*
@@ -160,11 +171,26 @@ func main() {
 	/*
 		Initializes route to update an existing board
 	*/
-	r.Post("/board/:id", func(context *gin.Context) {
-		var id = 1
+	r.Post("/board/update/:id", func(context *gin.Context) {
+		var id = context.Param("id")
 		var newContent = "new content"
 
+		//Need to pass in content similar to the way data was passed in the /board route
 		if err := UpdateBoard(id, newContent); err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	/*
+		Initializes route to delete an existing board
+	*/
+	r.Post("/board/delete/:id", func(context *gin.Context) {
+		var id = context.Param("id")
+
+		if err := DeleteBoard(id); err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
 			return
 		}
