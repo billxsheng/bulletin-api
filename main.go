@@ -119,7 +119,7 @@ func UpdateBoard(id int, newContent string) error {
 	DeleteBoard function where a board is deleted
 */
 func DeleteBoard(id int) error {
-	const q = `DELETE billboards WHERE id = $1`
+	const q = `DELETE FROM billboards WHERE id = $1`
 
 	_, err := db.Exec(q, id)
 	return err
@@ -173,7 +173,13 @@ func main() {
 	*/
 	r.Post("/board/update/:id", func(context *gin.Context) {
 		var id = context.Param("id")
-		var newContent = "new content"
+		var bodyByte []byte
+		var newContent string
+
+		if context.Request().Body != nil {
+			bodyByte, _ = ioutil.ReadAll(context.Request.Body)
+			newContent = bodyByte.
+		}
 
 		//Need to pass in content similar to the way data was passed in the /board route
 		if err := UpdateBoard(id, newContent); err != nil {
