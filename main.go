@@ -125,7 +125,6 @@ func DeleteBoard(id int) error {
 	return err
 }
 
-
 func main() {
 	var err error
 	/*
@@ -171,37 +170,37 @@ func main() {
 	/*
 		Initializes route to update an existing board
 	*/
-	r.Post("/board/update/:id", func(context *gin.Context) {
-		var id = context.Param("id")
-		var bodyByte []byte
-		var newContent string
+	r.POST("/board/update/:id", func(context *gin.Context) {
+		//var id = strconv.ParseInt(context.Param("id"))
+		//var bodyByte []byte
+		//var newContent string
 
-		if context.Request().Body != nil {
-			bodyByte, _ = ioutil.ReadAll(context.Request.Body)
-			newContent = bodyByte.
-		}
+		//if context.Request().Body != nil {
+		//	bodyByte, _ = ioutil.ReadAll()
+		//	newContent = bodyByte
+		//}
 
 		//Need to pass in content similar to the way data was passed in the /board route
-		if err := UpdateBoard(id, newContent); err != nil {
-			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
-			return
-		}
+		//if err := UpdateBoard(id, newContent); err != nil {
+		//	context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
+		//	return
+		//}
 
-		context.JSON(http.StatusOK, gin.H{"status": "ok"})
+		//context.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	/*
 		Initializes route to delete an existing board
 	*/
-	r.Post("/board/delete/:id", func(context *gin.Context) {
-		var id = context.Param("id")
-
-		if err := DeleteBoard(id); err != nil {
-			context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
-			return
-		}
-
-		context.JSON(http.StatusOK, gin.H{"status": "ok"})
+	r.POST("/board/delete/:id", func(context *gin.Context) {
+		//var id = context.Param("id")
+		//
+		//if err := DeleteBoard(id); err != nil {
+		//	context.JSON(http.StatusInternalServerError, gin.H{"status": "internal error: " + err.Error()})
+		//	return
+		//}
+		//
+		//context.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	/*
